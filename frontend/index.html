@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Notes</title>
+  <meta name="description" content="A beautiful and blazing fast serverless note taking application.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <div class="logo">
+        <i class="fa-solid fa-feather-pointed"></i>
+        <h1>Aura</h1>
+      </div>
+      <div class="search-container">
+        <i class="fa-solid fa-search search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Search notes...">
+      </div>
+      <button class="new-note-btn" id="newNoteBtn">
+        <i class="fa-solid fa-plus"></i> <span>New Note</span>
+      </button>
+    </header>
+
+    <main>
+      <section class="notes-section" id="pinnedSection">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-thumbtack pinned-icon"></i> Pinned</h2>
+        </div>
+        <div class="notes-grid" id="pinnedNotesGrid"></div>
+      </section>
+
+      <section class="notes-section" id="allSection">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-note-sticky"></i> All Notes</h2>
+        </div>
+        <div class="notes-grid" id="allNotesGrid"></div>
+      </section>
+      
+      <div id="emptyState" class="empty-state hidden">
+        <div class="empty-icon"><i class="fa-solid fa-pen-nib"></i></div>
+        <h3>No notes found</h3>
+        <p>Create a new note to capture your thoughts.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Note Modal -->
+  <div class="modal-overlay hidden" id="noteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <input type="text" id="modalTitle" placeholder="Note Title" required autocomplete="off">
+        <div class="modal-actions">
+          <button id="pinNoteBtn" class="action-btn" title="Pin Note"><i class="fa-solid fa-thumbtack"></i></button>
+          <button id="deleteNoteBtn" class="action-btn delete-btn hidden" title="Delete Note"><i class="fa-solid fa-trash"></i></button>
+          <button id="closeModalBtn" class="action-btn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <textarea id="modalContent" placeholder="Write your thoughts..." required></textarea>
+        <span class="error-text hidden" id="validationError">Please fill out both title and content.</span>
+      </div>
+      <div class="modal-footer">
+        <span class="save-status" id="saveStatus"></span>
+        <button id="saveNoteBtn" class="save-btn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

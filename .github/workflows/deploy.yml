@@ -1,0 +1,65 @@
+name: Deploy AWS Serverless Notes App
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write # required for OpenID Connect to AWS
+  contents: read
+
+jobs:
+  deploy-backend-and-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup AWS SAM CLI
+        uses: aws-actions/setup-sam@v2
+
+      - name: Build SAM Application
+        working-directory: ./backend
+        run: sam build
+
+      - name: Deploy SAM Application
+        working-directory: ./backend
+        run: |
+          sam deploy \
+            --stack-name notes-app-stack \
+            --capabilities CAPABILITY_IAM \
+            --resolve-s3 \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset
+
+      - name: Get API Gateway URL
+        working-directory: ./backend
+        id: api_url
+        run: |
+          API_URL=$(aws cloudformation describe-stacks \
+            --stack-name notes-app-stack \
+            --query "Stacks[0].Outputs[?OutputKey=='ApiEndpoint'].OutputValue" \
+            --output text)
+          echo "API_URL=$API_URL" >> $GITHUB_ENV
+
+      - name: Inject API URL into Frontend
+        working-directory: ./frontend
+        run: |
+          sed -i "s|YOUR_API_GATEWAY_URL_HERE|$API_URL|g" js/api.js
+
+      - name: Deploy Frontend to S3
+        working-directory: ./frontend
+        run: |
+          aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} --delete
